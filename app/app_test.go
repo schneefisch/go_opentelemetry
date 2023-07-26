@@ -23,7 +23,7 @@ type SpanContext struct {
 	TraceState string `json:"TraceState"`
 }
 
-type Trace struct {
+type TraceType struct {
 	Name        string      `json:"Name"`
 	Parent      Parent      `json:"Parent"`
 	SpanContext SpanContext `json:"SpanContext"`
@@ -41,7 +41,7 @@ func Test_testHandler(t *testing.T) {
 		t.Errorf("Unexpected Error-Response")
 	}
 
-	// check if trace-file exists
+	// check if traceResult-file exists
 	traceFile, err := os.Stat("traces.txt")
 	if errors.Is(err, os.ErrNotExist) {
 		t.Errorf("Traces file not found, but expected one: %v", err)
@@ -56,18 +56,18 @@ func Test_testHandler(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not read file: %v", err)
 	}
-	var trace Trace
-	err = json.Unmarshal(file, &trace)
+	var traceResult TraceType
+	err = json.Unmarshal(file, &traceResult)
 	if err != nil {
-		t.Errorf("Could not unmarshall trace: %v", err)
+		t.Errorf("Could not unmarshall traceResult: %v", err)
 	}
 
 	// expecting Parent.TraceID to be set
-	if trace.Parent.TraceID == "" {
+	if traceResult.Parent.TraceID == "" {
 		t.Errorf("Missing Parent.TraceID value")
 	}
 	// expecting SpanContext.TraceID to be set
-	if trace.SpanContext.TraceID == "" {
+	if traceResult.SpanContext.TraceID == "" {
 		t.Errorf("Missing SpanContext.TraceID value")
 	}
 }
@@ -76,6 +76,7 @@ func Test_testWithTraceParentInHeader(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodGet, "/api/test", nil)
+
 	request.Header.Set("traceparent", "")
 
 	myRequestHandler(recorder, request)
@@ -85,7 +86,7 @@ func Test_testWithTraceParentInHeader(t *testing.T) {
 		t.Errorf("Unexpected Error-Response")
 	}
 
-	// check if trace-file exists
+	// check if traceResult-file exists
 	traceFile, err := os.Stat("traces.txt")
 	if errors.Is(err, os.ErrNotExist) {
 		t.Errorf("Traces file not found, but expected one: %v", err)
@@ -100,18 +101,18 @@ func Test_testWithTraceParentInHeader(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not read file: %v", err)
 	}
-	var trace Trace
-	err = json.Unmarshal(file, &trace)
+	var traceResult TraceType
+	err = json.Unmarshal(file, &traceResult)
 	if err != nil {
-		t.Errorf("Could not unmarshall trace: %v", err)
+		t.Errorf("Could not unmarshall traceResult: %v", err)
 	}
 
 	// expecting Parent.TraceID to be set
-	if trace.Parent.TraceID == "" {
+	if traceResult.Parent.TraceID == "" {
 		t.Errorf("Missing Parent.TraceID value")
 	}
 	// expecting SpanContext.TraceID to be set
-	if trace.SpanContext.TraceID == "" {
+	if traceResult.SpanContext.TraceID == "" {
 		t.Errorf("Missing SpanContext.TraceID value")
 	}
 }
