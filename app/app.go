@@ -70,12 +70,12 @@ func InitApp() *chi.Mux {
 
 	// init endpoints and server
 	router := chi.NewRouter()
-	router.Get("/api/test", testHandler)
+	router.Get("/api/test", myRequestHandler)
 
 	return router
 }
 
-func testHandler(writer http.ResponseWriter, request *http.Request) {
+func myRequestHandler(writer http.ResponseWriter, request *http.Request) {
 	// adding tracer
 	_, span := otel.Tracer(name).Start(request.Context(), "Run")
 	defer span.End()
